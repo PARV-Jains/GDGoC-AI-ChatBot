@@ -1,0 +1,47 @@
+{
+  "name": "@stream-io/ai-nodejs-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "dev": "nodemon --exec \"npm run start\" --ext ts --watch src",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "download-files": "tsc && node GeminiVoiceAgent.ts download-files"
+  },
+  "keywords": [],
+  "author": "GetStream.io",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^1.0.19",
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google-cloud/speech": "^7.2.0",
+    "@google-cloud/text-to-speech": "^6.3.0",
+    "@google/genai": "^1.21.0",
+    "@livekit/agents": "^1.0.10",
+    "@livekit/agents-plugin-google": "^1.0.10",
+    "@livekit/agents-plugin-livekit": "^1.0.10",
+    "@livekit/agents-plugin-silero": "^1.0.10",
+    "@livekit/noise-cancellation-node": "^0.1.9",
+    "@types/node-fetch": "^2.6.13",
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "livekit-server-sdk": "^2.14.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.73.1",
+    "stream-chat": "^8.46.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.4.1",
+    "typescript": "^5.7.2"
+  }
+}
