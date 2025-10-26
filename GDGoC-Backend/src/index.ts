@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
  import { createAgent } from "./agents/createAgent.js";
 import { AgentPlatform, AIAgent } from "./agents/types.js";
-import { apiKey, serverClient } from "../serverClient.js";
+import { apiKey, serverClient } from "./serverClient.js";
 import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
 
 
@@ -44,7 +44,7 @@ setInterval(async () => {
 
 
 
-app.get("/", (req, res) => {
+app.get("/", (req: any, res: { json: (arg0: { message: string; apiKey: string; activeAgents: number; }) => void; }) => {
   res.json({
     message: "GDGoC IET DAVV Assistant Server is running",
     apiKey: apiKey,
@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
 /**
  * Handle the request to start the AI Agent
  */
-app.post("/start-ai-agent", async (req, res) => {
+app.post("/start-ai-agent", async (req: { body: { channel_id: any; channel_type?: "messaging" | undefined; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; reason?: string; }): void; new(): any; }; }; json: (arg0: { message: string; data: never[]; }) => void; }) => {
   const { channel_id, channel_type = "messaging" } = req.body;
   console.log(`[API] /start-ai-agent called for channel: ${channel_id}`);
 
@@ -115,7 +115,7 @@ app.post("/start-ai-agent", async (req, res) => {
 /**
  * Handle the request to stop the AI Agent
  */
-app.post("/stop-ai-agent", async (req, res) => {
+app.post("/stop-ai-agent", async (req: { body: { channel_id: any; }; }, res: { json: (arg0: { message: string; data: never[]; }) => void; status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; reason: string; }): void; new(): any; }; }; }) => {
   const { channel_id } = req.body;
   console.log(`[API] /stop-ai-agent called for channel: ${channel_id}`);
   const user_id = `ai-bot-${channel_id.replace(/[!]/g, "")}`;
@@ -138,7 +138,7 @@ app.post("/stop-ai-agent", async (req, res) => {
   }
 });
 
-app.get("/agent-status", (req, res) => {
+app.get("/agent-status", (req: { query: { channel_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; }; json: (arg0: { status: string; }) => void; }) => {
   const { channel_id } = req.query;
   if (!channel_id || typeof channel_id !== "string") {
     return res.status(400).json({ error: "Missing channel_id" });
@@ -161,7 +161,7 @@ app.get("/agent-status", (req, res) => {
 });
 
 // Token provider endpoint - generates secure tokens
-app.post("/token", async (req, res) => {
+app.post("/token", async (req: { body: { userId: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): void; new(): any; }; }; json: (arg0: { token: any; }) => void; }) => {
   try {
     const { userId } = req.body;
 
@@ -192,7 +192,7 @@ app.post("/token", async (req, res) => {
 
 
 
-app.post("/livekit-token", (req, res) => {
+app.post("/livekit-token", (req: { body: { roomName: any; identity: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; }; json: (arg0: { token: any; }) => void; }) => {
   const { roomName, identity } = req.body;
 
   if (!roomName || !identity) {
