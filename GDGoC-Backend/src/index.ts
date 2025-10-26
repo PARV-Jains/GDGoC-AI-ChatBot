@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
  import { createAgent } from "./agents/createAgent.js";
 import { AgentPlatform, AIAgent } from "./agents/types.js";
-import { apiKey, serverClient } from "../api/serverClient.js";
+import { apiKey, serverClient } from "../serverClient.js";
 import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
 
 
@@ -13,15 +13,15 @@ const app = express();
 app.use(express.json());
 
 
-const frontendURL = "https://gd-go-c-ai-chat-bot-aab4.vercel.app"; // Or .onrender.com if frontend is also on Render
+// const frontendURL = "https://gd-go-c-ai-chat-bot-aab4.vercel.app"; // Or .onrender.com if frontend is also on Render
 
-const corsOptions = {
-  origin: frontendURL,
-  // ...
-};
-app.options('*', cors(corsOptions));
-app.use(cors(corsOptions));
-// app.use(cors({ origin: "*" }));
+// const corsOptions = {
+//   origin: frontendURL,
+//   // ...
+// };
+// app.options('*', cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors({ origin: "*" }));
 
 // Map to store the AI Agent instances
 // [user_id string]: AI Agent
