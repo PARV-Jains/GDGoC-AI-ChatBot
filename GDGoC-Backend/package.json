@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "tsc && node dist/index.js",
+    "build":"tsc",
     "dev": "nodemon --exec \"npm run start\" --ext ts --watch src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "download-files": "tsc && node GeminiVoiceAgent.ts download-files"
