@@ -15,30 +15,49 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 interface LoginProps {
-  onLogin: (user: User) => void;
+  onLogin: (user: User, options: { persist: boolean }) => void;
 }
 
-// Function to create a deterministic user ID from username using SHA-256
-const createUserIdFromUsername = (username: string): string => {
-  // Use SHA-256 hash for secure, deterministic ID generation
-  const hash = sha256(username.toLowerCase().trim());
-
-  // Take first 12 characters and add prefix for readability
+const createUserIdFromIdentity = (identity: string): string => {
+  const hash = sha256(identity.toLowerCase().trim());
   return `user_${hash.substring(0, 12)}`;
+};
+
+const createGuestId = (): string => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `guest_${crypto.randomUUID()}`;
+  }
+  const fallback = sha256(`${Date.now()}-${Math.random()}`);
+  return `guest_${fallback.substring(0, 12)}`;
 };
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
+    if (username.trim() && email.trim() && password.trim()) {
       const user = {
-        id: createUserIdFromUsername(username.trim().toLowerCase()),
+        id: createUserIdFromIdentity(email.trim()),
         name: username.trim(),
+        email: email.trim(),
+        password_hash: sha256(password.trim()),
+        is_guest: false,
       };
-      onLogin(user);
+      onLogin(user, { persist: true });
     }
+  };
+
+  const handleGuest = () => {
+    const trimmedName = username.trim();
+    const user = {
+      id: createGuestId(),
+      name: trimmedName ? `${trimmedName} (Guest)` : "Guest",
+      is_guest: true,
+    };
+    onLogin(user, { persist: false });
   };
 
   return (
@@ -69,16 +88,55 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 className="h-10"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email..."
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a password..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-10"
+              />
+            </div>
           </form>
         </CardContent>
         <CardFooter>
-          <Button
-            onClick={handleSubmit}
-            className="w-full h-10"
-            disabled={!username.trim()}
-          >
-            Start Chatting
-          </Button>
+          <div className="w-full space-y-3">
+            <Button
+              onClick={handleSubmit}
+              className="w-full h-10"
+              disabled={!username.trim() || !email.trim() || !password.trim()}
+            >
+              Start Chatting
+            </Button>
+            <div className="text-center text-xs text-muted-foreground">
+              or continue without saving chats
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGuest}
+              className="w-full h-10"
+            >
+              Continue as Guest
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

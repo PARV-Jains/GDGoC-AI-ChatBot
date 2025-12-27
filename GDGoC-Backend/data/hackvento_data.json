@@ -1,0 +1,99 @@
+{
+  "event_id": "hackvento_2k26",
+  "basic_info": {
+    "name": "Hack'Vento 2k26",
+    "tagline": "Code The Upside Down",
+    "theme": "Stranger Things / Hawkins Lab",
+    "hashtags": [
+      "#HawkinsLab",
+      "#CodeTheUpsideDown",
+      "#StrangerHacks",
+      "#HackVento2K26",
+      "#HellfireCodingClub"
+    ],
+    "organizers": {
+      "hosted_by": "Google Developer Group on Campus IET DAVV",
+      "powered_by": "Hack2skill"
+    },
+    "format": {
+      "type": "Hybrid (Virtual Rounds + Offline Grand Finale)",
+      "cost": "Free",
+      "team_size": "Exactly 4 members"
+    },
+    "contact_email": "gdgoc@ietdavv.edu.in"
+  },
+  "timeline": {
+    "registration": {
+      "start": "17 Dec 2025, 05:00 PM IST",
+      "end": "31 Dec 2025, 11:59 PM IST",
+      "status": "Closes on Wed 31 Dec 2025"
+    },
+    "team_formation": {
+      "period": "17 Dec 2025 - 05 Jan 2026"
+    },
+    "project_submission": {
+      "start": "21 Dec 2025, 11:59 PM IST",
+      "end": "05 Jan 2026, 11:59 PM IST"
+    },
+    "shortlisting": {
+      "announcement_dates": "12 Jan 2026 - 13 Jan 2026"
+    },
+    "grand_finale": {
+      "date": "To Be Announced",
+      "mode": "Offline"
+    }
+  },
+  "problem_statements": [
+    {
+      "title": "Adaptive Student Time Utilisation & Learning Continuity",
+      "image": "https://storage.googleapis.com/vision-hack2skill-production/innovator/USER00170676/1766328734206-Student.webp"
+    },
+    {
+      "title": "Gamification of Community Learning",
+      "image": "https://storage.googleapis.com/vision-hack2skill-production/innovator/USER00170676/1766328517087-game.webp"
+    },
+    {
+      "title": "Centralized Internship & Placement Tracking Ecosystem",
+      "image": "https://storage.googleapis.com/vision-hack2skill-production/innovator/USER00170676/1766328456284-inter.webp"
+    },
+    {
+      "title": "Mental Well-Being Support for Students",
+      "image": "https://storage.googleapis.com/vision-hack2skill-production/innovator/USER00170676/1766341994724-images.webp"
+    },
+    {
+      "title": "Open Innovation",
+      "description": "You can work on any idea that aligns with the hackathon focus areas.",
+      "image": "https://h2svision.github.io/publicAssets/vision/challenges1.webp"
+    }
+  ],
+  "rules_and_requirements": {
+    "eligibility": "Beginners and experienced developers are both welcome. No prior experience needed.",
+    "participation_type": "Team participation only (Solo not allowed).",
+    "gender_requirements": "No restriction (One girl team member is NOT necessary).",
+    "project_rules": "Projects must be built during the hackathon duration. Pre-built code is not allowed, but open-source libraries/APIs are permitted.",
+    "offline_finale_requirements": [
+      "College ID",
+      "Laptop & charger",
+      "LAN Connector/ HDMI connector",
+      "Hardware/software material required for project",
+      "Extension board (if possible)",
+      "Personal meals and refreshments"
+    ]
+  },
+  "judging_criteria": [
+    "Innovation",
+    "Practicality",
+    "Technical implementation",
+    "Presentation"
+  ],
+  "resources": {
+    "submission_template": "https://drive.google.com/drive/folders/1cR9ZtYNnfnEvQ6X5PIXP3Xrf2C70h-kc?usp=sharing",
+    "whatsapp_group": "https://chat.whatsapp.com/HDsbyLyS58aKPycHQY1IXq",
+    "social_links": {
+      "instagram": "https://www.instagram.com/gdgoc.ietdavv",
+      "linkedin": "https://www.linkedin.com/company/gdgoc-iet-davv/",
+      "discord": "https://discord.gg/fEfntR6ee"
+    }
+  },
+  "description_long": "Hack'Vento is a fully GDG on Campus IET DAVV led hackathon where student developers get to identify real challenges in their campuses or local communities and build practical solutions using Google technologies. Whether it’s improving daily campus life, solving local community problems, or exploring new ways to use AI and Google tools, Hack'Vento gives you the freedom to innovate."
+}

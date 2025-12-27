@@ -5,6 +5,10 @@ import express from "express";
 import { AgentPlatform, AIAgent } from "./agents/types.js";
 import { apiKey, serverClient } from "./serverClient.js";
 import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
+import { refreshDriveImageIndex } from "./drive/driveImageIndex.js";
+import { refreshCsvIndex } from "./data/csvIndex.js";
+import { refreshJsonIndex } from "./data/jsonIndex.js";
+import { refreshQaIndex } from "./data/qaIndex.js";
 
 
 
@@ -138,6 +142,78 @@ app.post("/stop-ai-agent", async (req: { body: { channel_id: any; }; }, res: { j
   }
 });
 
+app.post("/refresh-drive-images", async (_req, res) => {
+  try {
+    const index = await refreshDriveImageIndex();
+    res.json({
+      message: "Drive images refreshed",
+      count: index.items.length,
+      refreshedAt: index.refreshedAt,
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error("Failed to refresh Drive images", errorMessage);
+    res.status(500).json({
+      error: "Failed to refresh Drive images",
+      reason: errorMessage,
+    });
+  }
+});
+
+app.post("/refresh-csv-index", async (_req, res) => {
+  try {
+    const index = await refreshCsvIndex();
+    res.json({
+      message: "CSV index refreshed",
+      count: index.records.length,
+      refreshedAt: index.refreshedAt,
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error("Failed to refresh CSV index", errorMessage);
+    res.status(500).json({
+      error: "Failed to refresh CSV index",
+      reason: errorMessage,
+    });
+  }
+});
+
+app.post("/refresh-json-index", async (_req, res) => {
+  try {
+    const index = await refreshJsonIndex();
+    res.json({
+      message: "JSON index refreshed",
+      count: index.records.length,
+      refreshedAt: index.refreshedAt,
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error("Failed to refresh JSON index", errorMessage);
+    res.status(500).json({
+      error: "Failed to refresh JSON index",
+      reason: errorMessage,
+    });
+  }
+});
+
+app.post("/refresh-qa-index", async (_req, res) => {
+  try {
+    const index = await refreshQaIndex();
+    res.json({
+      message: "QA index refreshed",
+      count: index.records.length,
+      refreshedAt: index.refreshedAt,
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error("Failed to refresh QA index", errorMessage);
+    res.status(500).json({
+      error: "Failed to refresh QA index",
+      reason: errorMessage,
+    });
+  }
+});
+
 app.get("/agent-status", (req: { query: { channel_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; }; json: (arg0: { status: string; }) => void; }) => {
   const { channel_id } = req.query;
   if (!channel_id || typeof channel_id !== "string") {
@@ -183,6 +259,60 @@ app.post("/token", async (req: { body: { userId: any; }; }, res: { status: (arg0
     console.error("Error generating token:", error);
     res.status(500).json({
       error: "Failed to generate token",
+    });
+  }
+});
+
+app.post("/guest-cleanup", async (req, res) => {
+  try {
+    const { userId } = req.body as { userId?: string };
+
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required" });
+    }
+
+    const filter = { type: "messaging", members: { $in: [userId] } };
+    const sort = { last_message_at: -1 };
+    const limit = 30;
+    let offset = 0;
+
+    for (;;) {
+      const channels = await serverClient.queryChannels(filter, sort, {
+        limit,
+        offset,
+      });
+
+      if (!channels.length) {
+        break;
+      }
+
+      for (const channel of channels) {
+        try {
+          await channel.delete();
+        } catch (error) {
+          console.error("Failed to delete guest channel", error);
+        }
+      }
+
+      offset += channels.length;
+      if (channels.length < limit) {
+        break;
+      }
+    }
+
+    try {
+      await serverClient.deleteUser(userId, { hard_delete: true });
+    } catch (error) {
+      console.error("Failed to delete guest user", error);
+    }
+
+    res.json({ message: "Guest cleanup completed" });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error("Failed to cleanup guest session", errorMessage);
+    res.status(500).json({
+      error: "Failed to cleanup guest session",
+      reason: errorMessage,
     });
   }
 });

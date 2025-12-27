@@ -10,6 +10,10 @@ GenerateContentResponse,
 import fetch from 'node-fetch';
 
 import type { Channel, Event, MessageResponse, StreamChat } from "stream-chat";
+import { searchDriveImages, DriveImageItem } from "../../drive/driveImageIndex.js";
+import { searchCsvRecords } from "../../data/csvIndex.js";
+import { searchJsonRecords } from "../../data/jsonIndex.js";
+import { searchQaRecords } from "../../data/qaIndex.js";
 // import { AgentSession } from '@livekit/agents';
 
 
@@ -23,7 +27,7 @@ interface ToolOutput {
 const webSearchFunctionDeclaration: FunctionDeclaration = {
   name: "web_search",
   description:
-    "Search the web for current information about GDGOC IET DAVV events, workshops, or general tech news.",
+    "Search the web for current information about GDGOC IET DAVV events, workshops, or official updates on the GDGOC sites.",
   parameters: {
     type: Type.OBJECT,
     properties: {
@@ -51,7 +55,85 @@ const imageAnalysisFunctionDeclaration: FunctionDeclaration = {
   },
 };
 
+const driveImageSearchFunctionDeclaration: FunctionDeclaration = {
+  name: "drive_image_search",
+  description:
+    "Search the indexed GDGOC IET DAVV Drive images and captions for relevant results.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: {
+        type: Type.STRING,
+        description: "Search query for the Drive image index.",
+      },
+      limit: {
+        type: Type.NUMBER,
+        description: "Max number of images to return (default 5).",
+      },
+    },
+    required: ["query"],
+  },
+};
 
+const csvSearchFunctionDeclaration: FunctionDeclaration = {
+  name: "csv_search",
+  description:
+    "Search the indexed GDGOC IET DAVV CSV datasets for structured answers.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: {
+        type: Type.STRING,
+        description: "Search query for the CSV index.",
+      },
+      limit: {
+        type: Type.NUMBER,
+        description: "Max number of records to return (default 5).",
+      },
+    },
+    required: ["query"],
+  },
+};
+
+const jsonSearchFunctionDeclaration: FunctionDeclaration = {
+  name: "json_search",
+  description:
+    "Search the indexed GDGOC IET DAVV JSON datasets for structured answers.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: {
+        type: Type.STRING,
+        description: "Search query for the JSON index.",
+      },
+      limit: {
+        type: Type.NUMBER,
+        description: "Max number of records to return (default 5).",
+      },
+    },
+    required: ["query"],
+  },
+};
+
+const qaSearchFunctionDeclaration: FunctionDeclaration = {
+  name: "qa_search",
+  description:
+    "Search the indexed GDGOC IET DAVV QA pairs for a direct answer.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: {
+        type: Type.STRING,
+        description: "Search query for the QA index.",
+      },
+      limit: {
+        type: Type.NUMBER,
+        description: "Max number of records to return (default 3).",
+      },
+    },
+    required: ["query"],
+  },
+};
 // const voicesession = new AgentSession({
 //     // Use the best available model for Spanish
 //     stt: "auto:es",
@@ -87,6 +169,11 @@ export class GEMINIResponseHandler {
   private run_id = "";
   private is_done = false;
   private last_update_time = 0;
+  private driveImageResults: DriveImageItem[] = [];
+  private static readonly perChannelThrottleMs = 2500;
+  private static readonly lastRequestByChannel = new Map<string, number>();
+  private static readonly maxRetries = 3;
+  private static readonly baseRetryDelayMs = 800;
 
 
   constructor(
@@ -103,6 +190,41 @@ private readonly ai: GoogleGenAI,
      this.run_id = this.message.id; 
   }
 
+  private async sendMessageStreamWithRetry(requestParts: Part[]) {
+    let attempt = 0;
+    while (true) {
+      try {
+        return await this.chatSession.sendMessageStream({
+          message: requestParts,
+          config: {
+            tools: [
+              {
+                functionDeclarations: [
+                  webSearchFunctionDeclaration,
+                  imageAnalysisFunctionDeclaration,
+                  driveImageSearchFunctionDeclaration,
+                  csvSearchFunctionDeclaration,
+                  jsonSearchFunctionDeclaration,
+                  qaSearchFunctionDeclaration,
+                ],
+              },
+            ],
+          },
+        });
+      } catch (error) {
+        attempt += 1;
+        const status = (error as { status?: number })?.status;
+        if (attempt > GEMINIResponseHandler.maxRetries || status !== 429) {
+          throw error;
+        }
+        const delay =
+          GEMINIResponseHandler.baseRetryDelayMs *
+          Math.pow(2, attempt - 1);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
      run = async () => {
     const { cid, id: message_id } = this.message;
     let userMessage = this.initialMessage.text;
@@ -111,6 +233,17 @@ private readonly ai: GoogleGenAI,
 
     // The chat loop continues until a full response without function calls is streamed
     try {
+      const now = Date.now();
+      const lastRequest =
+        GEMINIResponseHandler.lastRequestByChannel.get(cid) ?? 0;
+      if (now - lastRequest < GEMINIResponseHandler.perChannelThrottleMs) {
+        this.message_text =
+          "Please wait a moment before sending another request so everyone can get a response.";
+        this.handleCompletion();
+        return;
+      }
+      GEMINIResponseHandler.lastRequestByChannel.set(cid, now);
+
       while (!isCompleted) {
         // 1. Prepare parts for the request
          const requestParts: Part[] = [];
@@ -145,12 +278,7 @@ private readonly ai: GoogleGenAI,
         }
 
         // 2. Start streaming the response
-     const stream = await this.chatSession.sendMessageStream({
-    message: requestParts,
-    config: {
-        tools: [{ functionDeclarations: [webSearchFunctionDeclaration,imageAnalysisFunctionDeclaration ] }],
-    },
-});
+     const stream = await this.sendMessageStreamWithRetry(requestParts);
 //  const stream = await this.chatSession.sendMessageStream(requestParts);
 
         // Indicate generation started
@@ -232,6 +360,175 @@ private readonly ai: GoogleGenAI,
                 });
               }
             }
+
+            if (call.name === "drive_image_search") {
+              if (!call.args || typeof call.args.query !== "string") {
+                console.error(
+                  "Drive image search call is missing required 'query' argument."
+                );
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "drive_image_search",
+                    response: { error: "Missing required 'query' argument" },
+                  },
+                });
+                continue;
+              }
+
+              const limit =
+                typeof call.args.limit === "number" && call.args.limit > 0
+                  ? Math.min(call.args.limit, 10)
+                  : 5;
+
+              try {
+                const searchResult = await searchDriveImages(
+                  call.args.query as string,
+                  limit
+                );
+                this.driveImageResults = searchResult.items ?? [];
+
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "drive_image_search",
+                    response: searchResult,
+                  },
+                });
+              } catch (e) {
+                console.error("Error performing Drive image search", e);
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "drive_image_search",
+                    response: { error: "failed to call tool" },
+                  },
+                });
+              }
+            }
+
+            if (call.name === "csv_search") {
+              if (!call.args || typeof call.args.query !== "string") {
+                console.error(
+                  "CSV search call is missing required 'query' argument."
+                );
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "csv_search",
+                    response: { error: "Missing required 'query' argument" },
+                  },
+                });
+                continue;
+              }
+
+              const limit =
+                typeof call.args.limit === "number" && call.args.limit > 0
+                  ? Math.min(call.args.limit, 10)
+                  : 5;
+
+              try {
+                const searchResult = await searchCsvRecords(
+                  call.args.query as string,
+                  limit
+                );
+
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "csv_search",
+                    response: searchResult,
+                  },
+                });
+              } catch (e) {
+                console.error("Error performing CSV search", e);
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "csv_search",
+                    response: { error: "failed to call tool" },
+                  },
+                });
+              }
+            }
+
+            if (call.name === "json_search") {
+              if (!call.args || typeof call.args.query !== "string") {
+                console.error(
+                  "JSON search call is missing required 'query' argument."
+                );
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "json_search",
+                    response: { error: "Missing required 'query' argument" },
+                  },
+                });
+                continue;
+              }
+
+              const limit =
+                typeof call.args.limit === "number" && call.args.limit > 0
+                  ? Math.min(call.args.limit, 10)
+                  : 5;
+
+              try {
+                const searchResult = await searchJsonRecords(
+                  call.args.query as string,
+                  limit
+                );
+
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "json_search",
+                    response: searchResult,
+                  },
+                });
+              } catch (e) {
+                console.error("Error performing JSON search", e);
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "json_search",
+                    response: { error: "failed to call tool" },
+                  },
+                });
+              }
+            }
+
+            if (call.name === "qa_search") {
+              if (!call.args || typeof call.args.query !== "string") {
+                console.error(
+                  "QA search call is missing required 'query' argument."
+                );
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "qa_search",
+                    response: { error: "Missing required 'query' argument" },
+                  },
+                });
+                continue;
+              }
+
+              const limit =
+                typeof call.args.limit === "number" && call.args.limit > 0
+                  ? Math.min(call.args.limit, 5)
+                  : 3;
+
+              try {
+                const searchResult = await searchQaRecords(
+                  call.args.query as string,
+                  limit
+                );
+
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "qa_search",
+                    response: searchResult,
+                  },
+                });
+              } catch (e) {
+                console.error("Error performing QA search", e);
+                toolOutputs.push({
+                  functionResponse: {
+                    name: "qa_search",
+                    response: { error: "failed to call tool" },
+                  },
+                });
+              }
+            }
           }
 
           // Continue the loop to submit tool outputs to the model
@@ -266,8 +563,18 @@ private readonly ai: GoogleGenAI,
 private handleCompletion = () => {
     const { cid, id } = this.message;
     // Final update with the complete text
+    const attachments =
+      this.driveImageResults.length > 0
+        ? this.driveImageResults.slice(0, 3).map((item) => ({
+            type: "image",
+            image_url: item.directUrl,
+            title: item.name,
+            text: item.description,
+          }))
+        : undefined;
+
     this.chatClient.partialUpdateMessage(id, {
-      set: { text: this.message_text },
+      set: { text: this.message_text, ...(attachments ? { attachments } : {}) },
     });
     // Clear the AI indicator
     this.channel.sendEvent({
@@ -319,7 +626,7 @@ private handleStopGenerating = async (event: Event) => {
     await this.dispose();
   };
 
-    private performWebSearch = async (query: string): Promise<string> => {
+  private performWebSearch = async (query: string): Promise<string> => {
     const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 
     if (!TAVILY_API_KEY) {
@@ -328,7 +635,12 @@ private handleStopGenerating = async (event: Event) => {
       });
     }
 
-    console.log(`Performing web search for: "${query}"`);
+    const requiredPhrase = "gdgoc iet davv";
+    const normalizedQuery = query.toLowerCase().includes(requiredPhrase)
+      ? query
+      : `${query} "${requiredPhrase}"`;
+
+    console.log(`Performing web search for: "${normalizedQuery}"`);
 
     try {
       // Using global fetch here, assuming a Node.js environment with fetch support
@@ -339,7 +651,7 @@ private handleStopGenerating = async (event: Event) => {
       Authorization: `Bearer ${TAVILY_API_KEY}`,
         },
         body: JSON.stringify({
-          query: query,
+          query: normalizedQuery,
           search_depth: "advanced",
           max_results: 5,
           include_answer: true,

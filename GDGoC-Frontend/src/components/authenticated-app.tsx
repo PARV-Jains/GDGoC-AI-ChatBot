@@ -20,7 +20,7 @@ import { ChatSidebar } from "./chat-sidebar";
 
 interface AuthenticatedAppProps {
   user: User;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
 }
 
 export const AuthenticatedApp = ({ user, onLogout }: AuthenticatedAppProps) => (

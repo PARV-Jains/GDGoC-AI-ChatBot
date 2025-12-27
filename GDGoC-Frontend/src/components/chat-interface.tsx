@@ -100,7 +100,7 @@ const EmptyStateWithInput: React.FC<EmptyStateWithInputProps> = ({ onNewChatMess
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="flex flex-col h-full bg-transparent">
       <div className="flex-1 flex items-center justify-center overflow-y-auto p-6">
         <div className="text-center max-w-3xl w-full">
           <div className="mb-6">
@@ -139,7 +139,7 @@ const EmptyStateWithInput: React.FC<EmptyStateWithInputProps> = ({ onNewChatMess
         </div>
       </div>
 
-      <div className="border-t bg-background/95 backdrop-blur-sm">
+      <div className="border-t bg-background/95 backdrop-blur-sm gdg-input-shell">
         <div className="p-4">
           {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
           {imagePreview && (
@@ -241,7 +241,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onToggleSidebar, o
     }
 
     return (
-      <div className="p-4 border-t bg-background/95 backdrop-blur-sm">
+      <div className="p-4 border-t bg-background/95 backdrop-blur-sm gdg-input-shell">
         {imagePreview && (
           <div className="relative w-24 h-24 mb-2">
             <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-md" />
@@ -276,7 +276,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onToggleSidebar, o
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background gdg-chat-bg">
       <header className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur-sm z-10">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="lg:hidden h-9 w-9">

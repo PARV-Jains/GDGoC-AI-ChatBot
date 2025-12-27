@@ -1,0 +1,63 @@
+{
+  "club_info": {
+    "name": "Google Developer Groups on Campus IET DAVV",
+    "location": "IET DAVV, Indore, Madhya Pradesh, India",
+    "stats": {
+      "members": "500+",
+      "events": "50+",
+      "projects": "20+",
+      "workshops": "100+"
+    },
+    "mission": "To empower future developers by bringing students passionate about technology together and helping them grow their skills in tech, regardless of background.",
+    "values": ["Innovation", "Collaboration", "Learning", "Inclusivity"]
+  },
+  "major_hackathon": {
+    "name": "Hack'Vento 2k26",
+    "theme_tags": ["#HawkinsLab", "#CodeTheUpsideDown", "#StrangerHacks", "#HellfireCodingClub"],
+    "status": "Upcoming / Ongoing",
+    "dates": {
+      "registration_start": "17 Dec 2025",
+      "registration_end": "31 Dec 2025",
+      "team_formation_end": "05 Jan 2026",
+      "shortlisting": "12 Jan 2026 - 13 Jan 2026",
+      "grand_finale": "To Be Announced (Offline)"
+    },
+    "description": "Hack'Vento is a fully GDG on Campus IET DAVV led hackathon where student developers identify real challenges in their campuses or local communities and build practical solutions using Google technologies.",
+    "participation_rules": {
+      "team_size": 4,
+      "eligibility": "Beginners and experienced developers are both welcome.",
+      "solo_participation": "No, you must form a team of 4.",
+      "gender_rule": "No restriction on gender ratio (no mandatory girl member)."
+    },
+    "challenges": [
+      "Adaptive Student Time Utilisation & Learning Continuity",
+      "Gamification of Community Learning",
+      "Centralized Internship & Placement Tracking Ecosystem",
+      "Mental Well-Being Support for Students",
+      "Open Innovation"
+    ],
+    "judging_criteria": ["Innovation", "Practicality", "Technical implementation", "Presentation"]
+  },
+  "past_events": [
+    {
+      "name": "Google Cloud Study Jam 2025",
+      "type": "Bootcamp",
+      "stats": "200 registered",
+      "description": "A hands-on learning event by Google exploring cloud computing, labs, and skill badges."
+    },
+    {
+      "name": "First Flight with FlutterFlow",
+      "date": "Sept 27 2025",
+      "type": "Workshop",
+      "stats": "70 registered",
+      "description": "In collaboration with FlutterFlow Developer Groups Indore. Visual app building workshop."
+    },
+    {
+      "name": "How to crack Google internships and win SIH",
+      "date": "Sept 07 2025",
+      "type": "Session",
+      "stats": "250 registered",
+      "speakers": ["Yashashvi Sharma", "Vinamra Hetwal", "Tilak Neema", "Anurag tiwari"]
+    }
+  ]
+}

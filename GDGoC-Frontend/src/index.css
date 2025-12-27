@@ -15,7 +15,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262 80% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -27,7 +27,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262 80% 60%;
+    --ring: 221 83% 53%;
     --radius: 0.75rem;
   }
 
@@ -38,7 +38,7 @@
     --card-foreground: 210 20% 95%;
     --popover: 220 15% 12%;
     --popover-foreground: 210 20% 95%;
-    --primary: 262 80% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 15% 16%;
     --secondary-foreground: 210 20% 90%;
@@ -50,7 +50,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 15% 20%;
     --input: 220 15% 18%;
-    --ring: 262 80% 60%;
+    --ring: 221 83% 53%;
   }
 }
 
@@ -185,5 +185,111 @@
 
   .str-chat__theme-dark .str-chat__channel-list-messenger {
     background-color: hsl(var(--background));
+  }
+
+  .gdg-chat-bg {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .gdg-chat-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(420px 420px at 12% 18%, rgba(66, 133, 244, 0.18), transparent 70%),
+      radial-gradient(380px 380px at 88% 16%, rgba(234, 67, 53, 0.16), transparent 72%),
+      radial-gradient(420px 420px at 16% 88%, rgba(52, 168, 83, 0.16), transparent 70%),
+      radial-gradient(360px 360px at 86% 86%, rgba(251, 188, 5, 0.16), transparent 68%);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .gdg-chat-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/newlogo.svg");
+    background-repeat: no-repeat;
+    background-position: 82% 12%;
+    background-size: 320px 320px;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .gdg-chat-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .gdg-chat-bg .str-chat,
+  .gdg-chat-bg .str-chat__container,
+  .gdg-chat-bg .str-chat__channel,
+  .gdg-chat-bg .str-chat__window,
+  .gdg-chat-bg .str-chat__main-panel,
+  .gdg-chat-bg .str-chat__list,
+  .gdg-chat-bg .str-chat__message-list,
+  .gdg-chat-bg .str-chat__main-panel-inner {
+    background: transparent;
+  }
+
+  .gdg-chat-bg .str-chat__message-bubble {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(66, 133, 244, 0.18);
+    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .gdg-chat-bg .str-chat__message-bubble--me {
+    background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+    border-color: rgba(30, 64, 175, 0.6);
+    color: #ffffff;
+  }
+
+  .gdg-chat-bg .str-chat__message-bubble--me a,
+  .gdg-chat-bg .str-chat__message-bubble--me code,
+  .gdg-chat-bg .str-chat__message-bubble--me pre {
+    color: #ffffff;
+  }
+
+  .gdg-chat-bg .gdg-input-shell {
+    background: hsl(var(--background));
+    border-color: rgba(148, 163, 184, 0.4);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+  }
+
+  .gdg-chat-bg .gdg-input-shell textarea {
+    background: hsl(var(--background));
+    border-color: rgba(148, 163, 184, 0.35);
+    color: hsl(var(--foreground));
+  }
+
+  .gdg-chat-bg .gdg-input-shell textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .dark .gdg-chat-bg .str-chat__message-bubble {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: hsl(var(--foreground));
+  }
+
+  .dark .gdg-chat-bg .str-chat__message-bubble--me {
+    background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+    border-color: rgba(30, 64, 175, 0.6);
+  }
+
+  .dark .gdg-chat-bg .gdg-input-shell {
+    background: hsl(var(--background));
+    border-color: rgba(148, 163, 184, 0.4);
+  }
+
+  .dark .gdg-chat-bg .gdg-input-shell textarea {
+    background: hsl(var(--background));
+    border-color: rgba(148, 163, 184, 0.35);
+    color: hsl(var(--foreground));
   }
 }

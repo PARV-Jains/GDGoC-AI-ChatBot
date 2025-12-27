@@ -35,7 +35,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   sendMessage,
   isGenerating = false,
   onStopGenerating,
-  placeholder = "Ask me to write something, or paste text to improve...",
+  placeholder = "Ask me About GDGoC IET DAVV , Projects , hackathons and more ...",
   value,
   onValueChange,
   textareaRef: externalTextareaRef,
@@ -154,7 +154,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               accept="image/*"
               className="hidden"
             />
-            <div className="absolute left-2 bottom-2 flex items-center gap-1 z-10">
+            {/* <div className="absolute left-2 bottom-2 flex items-center gap-1 z-10">
               <Button
                 type="button"
                 variant="ghost"
@@ -165,13 +165,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 title="Attach image"
               >
                 <Paperclip className="h-4 w-4" />
-              </Button>
+              </Button> */}
 
               {/* Conditionally render VoiceAssistant and pass required props */}
               {/* {client.user?.id && (
                 <VoiceAssistant userId={client.user.id} channelId={channel?.id} onNewChannelRequest={onNewChannelRequest} />
               )} */}
-            </div>
+            {/* </div> */}
 
             <Textarea
               ref={textareaRef}

@@ -26,7 +26,7 @@ import { useTheme } from "../hooks/use-theme";
 interface ChatSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
   onNewChat: () => void;
   onChannelDelete: (channel: Channel) => void;
 }

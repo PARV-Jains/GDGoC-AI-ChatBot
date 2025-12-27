@@ -1,0 +1,146 @@
+[
+  {
+    "id": "proj_001",
+    "title": "404 System Failure Portal",
+    "type": "Web Project",
+    "description": "This is an 404 portal for the upcoming hackathon conducted by GDGoC IET DAVV. It is based on Stranger Things Theme. It includes a small fun game and will display a meme on successfully completion of the game.",
+    "tech_stack": ["HTML", "CSS", "Javascript"],
+    "contributors": ["Utkarsh Mandloi", "Parv Jain", "Atharv Porwal"],
+    "links": {
+      "repo": "https://github.com/GDGoC-IET-DAVV/404.git",
+      "live": "https://expect-the-unexpected.onrender.com/"
+    }
+  },
+  {
+    "id": "proj_002",
+    "title": "Cloud study jams leaderboard",
+    "type": "Web Project",
+    "description": "Unorganised excel data shifted to an organized leaderboard and ease of access to view and track skill badges for participants of cloud study jams.",
+    "tech_stack": ["React", "MongoDB"],
+    "contributors": ["Anadi sharma"],
+    "links": {
+      "repo": null,
+      "live": "https://gdgoc-ietdavv.netlify.app/"
+    }
+  },
+  {
+    "id": "proj_003",
+    "title": "GDG IET latest Website",
+    "type": "Web Project",
+    "description": "The official GDGoC IET DAVV website, with a custom admin panel for seamless content management of events, projects, and club information.",
+    "tech_stack": ["React", "Vite", "Typescript", "Supabase"],
+    "contributors": ["Atharv Garg", "Darpan Porwal"],
+    "links": {
+      "repo": "https://github.com/atharvgarg18/gdgoc-revamped",
+      "live": "https://gdgoc-ietdavv.netlify.app/"
+    }
+  },
+  {
+    "id": "proj_004",
+    "title": "IET Connect App",
+    "type": "Mobile Project",
+    "description": "IET Connect App is a one stop platform for students, bringing together all college resources in one place. From notes and syllabi to events and updates, it simplifies campus life with easy, organized access.",
+    "tech_stack": ["React native"],
+    "contributors": ["Manas Bhandari", "Huzefa Qureshi", "Mohit Maravi"],
+    "links": {
+      "repo": null,
+      "live": "https://iet-connect.vercel.app/"
+    }
+  },
+  {
+    "id": "proj_005",
+    "title": "Vent Chase Among Us Game",
+    "type": "Web Project",
+    "description": "Vent Chase, an HTML5 game where players, as the last surviving crewmate, must pursue a saboteur through a spaceship's vents. The game features a branching narrative and a secure, token-based reward system.",
+    "tech_stack": ["HTML", "CSS", "Javascript"],
+    "contributors": ["Rudra Pratap Singh", "Uthkarsh Mandloi"],
+    "links": {
+      "repo": "https://github.com/rudraPratapSing-H/amongusChase.git",
+      "live": "https://amonguschase.onrender.com/"
+    }
+  },
+  {
+    "id": "proj_006",
+    "title": "Automated Event Ticketing & Attendance System",
+    "type": "Mobile Project",
+    "description": "A comprehensive, dual-backend system for seamless event management. The primary Python backend automates ticket generation. The secondary backend serves a React Native mobile app for scanning tickets.",
+    "tech_stack": ["Python", "Google Cloud Platform", "MongoDB", "React Native"],
+    "contributors": ["Uthkarsh Mandloi"],
+    "links": {
+      "repo": "https://github.com/UthkarshMandloi/Automated_Tickiting_System.git",
+      "live": null
+    }
+  },
+  {
+    "id": "proj_007",
+    "title": "Certificate Automation",
+    "type": "Web Project",
+    "description": "An automated system that generates and manages personalized event certificates using Excel data and templates.",
+    "tech_stack": ["React", "Typescript", "Python"],
+    "contributors": ["Kavyansh Saxena"],
+    "links": {
+      "repo": null,
+      "live": null
+    }
+  },
+  {
+    "id": "proj_008",
+    "title": "Online Quiz & Examination Platform",
+    "type": "Web Project",
+    "description": "Platform developed for student selection for AI/ML Workshops. Allows uploading questions in PDF/JSON, tracking cheating attempts, flexible timers, and logging results to Google Sheets.",
+    "tech_stack": [],
+    "contributors": ["Rudra Pratap Singh"],
+    "links": {
+      "repo": null,
+      "live": "https://test-gdg-ietdavv-qllq.onrender.com/"
+    }
+  },
+  {
+    "id": "proj_009",
+    "title": "Websprint Website",
+    "type": "Web Project",
+    "description": "The official event platform for the WebSprint competition organized by GDGOC IET DAVV.",
+    "tech_stack": ["HTML", "CSS", "Javascript"],
+    "contributors": ["Mitali Mehra"],
+    "links": {
+      "repo": null,
+      "live": "https://gdgoc-websprint.netlify.app/"
+    }
+  },
+  {
+    "id": "proj_010",
+    "title": "Treasure In The Shell",
+    "type": "Web Project",
+    "description": "Event submission platform featuring a dynamic admin panel with realtime updation of team's entries for the contest.",
+    "tech_stack": ["React", "Typescript", "Supabase"],
+    "contributors": ["Atharv Garg", "Suwaaq Kothari"],
+    "links": {
+      "repo": "https://github.com/Skothari-11677/treaureFound",
+      "live": "https://treasurefound.netlify.app/"
+    }
+  },
+  {
+    "id": "proj_011",
+    "title": "Red Light Green Light Squid Game",
+    "type": "Web Project",
+    "description": "A fun Red Light Green Light game inspired by Squid Game, built as an engaging activity for students.",
+    "tech_stack": ["HTML", "CSS", "Javascript"],
+    "contributors": ["Yashasvi Sharma", "Harsh Gupta"],
+    "links": {
+      "repo": "https://github.com/Harshgupta88156/GDSC-IET-DAVV.git",
+      "live": "https://gdsc-iet-davv-rho.vercel.app/"
+    }
+  },
+  {
+    "id": "proj_012",
+    "title": "GDSC Old Website",
+    "type": "Web Project",
+    "description": "The initial website of GDSC IET DAVV, has collection of all previous resources and informations.",
+    "tech_stack": ["Typescript", "Javascript", "SCSS", "CSS"],
+    "contributors": ["Kanishk Tiwari"],
+    "links": {
+      "repo": "https://github.com/GDSC-IETDAVV/GDSC_Website",
+      "live": "https://gdsc.ietdavv.edu.in/"
+    }
+  }
+]
