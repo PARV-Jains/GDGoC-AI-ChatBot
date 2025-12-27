@@ -1,0 +1,7 @@
+services:
+  - type: static
+    name: GDGoC-AI-ChatBot-3
+    headers:
+      - path: "/*"
+        name: Content-Security-Policy
+        value: "frame-ancestors 'self' https://gdgoc-ietdavv.netlify.app"
