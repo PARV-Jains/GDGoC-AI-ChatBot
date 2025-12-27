@@ -226,7 +226,8 @@ private readonly ai: GoogleGenAI,
   }
 
      run = async () => {
-    const { cid, id: message_id } = this.message;
+    const { cid: messageCid, id: message_id } = this.message;
+    const cid = messageCid ?? this.channel.cid;
     let userMessage = this.initialMessage.text;
     let toolOutputs: ToolOutput[] = [];
     let isCompleted = false;

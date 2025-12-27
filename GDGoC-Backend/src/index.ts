@@ -1,21 +1,19 @@
-import cors from "cors";
-import "dotenv/config";
-import express from "express";
- import { createAgent } from "./agents/createAgent.js";
-import { AgentPlatform, AIAgent } from "./agents/types.js";
-import { apiKey, serverClient } from "./serverClient.js";
-import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
-import { refreshDriveImageIndex } from "./drive/driveImageIndex.js";
-import { refreshCsvIndex } from "./data/csvIndex.js";
-import { refreshJsonIndex } from "./data/jsonIndex.js";
-import { refreshQaIndex } from "./data/qaIndex.js";
-
-
-
+import cors from 'cors';
+import 'dotenv/config';
+import express from 'express';
+import type { Request, Response } from 'express';
+import { createAgent } from './agents/createAgent.js';
+import { AgentPlatform, AIAgent } from './agents/types.js';
+import { apiKey, serverClient } from './serverClient.js';
+import { RoomServiceClient, AccessToken } from 'livekit-server-sdk';
+import type { AscDesc, ChannelSort } from 'stream-chat';
+import { refreshDriveImageIndex } from './drive/driveImageIndex.js';
+import { refreshCsvIndex } from './data/csvIndex.js';
+import { refreshJsonIndex } from './data/jsonIndex.js';
+import { refreshQaIndex } from './data/qaIndex.js';
 
 const app = express();
 app.use(express.json());
-
 
 // const frontendURL = "https://gd-go-c-ai-chat-bot-aab4.vercel.app"; // Or .onrender.com if frontend is also on Render
 
@@ -25,7 +23,7 @@ app.use(express.json());
 // };
 // app.options('*', cors(corsOptions));
 // app.use(cors(corsOptions));
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: '*' }));
 
 // Map to store the AI Agent instances
 // [user_id string]: AI Agent
@@ -39,37 +37,49 @@ setInterval(async () => {
   const now = Date.now();
   for (const [userId, aiAgent] of aiAgentCache) {
     if (now - aiAgent.getLastInteraction() > inactivityThreshold) {
-      console.log(`Disposing GDGoC IET DAVV Agent due to inactivity: ${userId}`);
+      console.log(
+        `Disposing GDGoC IET DAVV Agent due to inactivity: ${userId}`
+      );
       await disposeAiAgent(aiAgent);
       aiAgentCache.delete(userId);
     }
   }
 }, 5000);
 
-
-
-app.get("/", (req: any, res: { json: (arg0: { message: string; apiKey: string; activeAgents: number; }) => void; }) => {
-  res.json({
-    message: "GDGoC IET DAVV Assistant Server is running",
-    apiKey: apiKey,
-    activeAgents: aiAgentCache.size,
-  });
-});
+app.get(
+  '/',
+  (
+    req: any,
+    res: {
+      json: (arg0: {
+        message: string;
+        apiKey: string;
+        activeAgents: number;
+      }) => void;
+    }
+  ) => {
+    res.json({
+      message: 'GDGoC IET DAVV Assistant Server is running',
+      apiKey: apiKey,
+      activeAgents: aiAgentCache.size,
+    });
+  }
+);
 
 /**
  * Handle the request to start the AI Agent
  */
-app.post("/start-ai-agent", async (req: { body: { channel_id: any; channel_type?: "messaging" | undefined; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; reason?: string; }): void; new(): any; }; }; json: (arg0: { message: string; data: never[]; }) => void; }) => {
-  const { channel_id, channel_type = "messaging" } = req.body;
+app.post('/start-ai-agent', async (req: Request, res: Response) => {
+  const { channel_id, channel_type = 'messaging' } = req.body;
   console.log(`[API] /start-ai-agent called for channel: ${channel_id}`);
 
   // Simple validation
   if (!channel_id) {
-    res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ error: 'Missing required fields' });
     return;
   }
 
-  const user_id = `ai-bot-${channel_id.replace(/[!]/g, "")}`;
+  const user_id = `ai-bot-${channel_id.replace(/[!]/g, '')}`;
 
   try {
     // Prevent multiple agents from being created for the same channel simultaneously
@@ -79,7 +89,7 @@ app.post("/start-ai-agent", async (req: { body: { channel_id: any; channel_type?
 
       await serverClient.upsertUser({
         id: user_id,
-        name: "GDGoC IET DAVV Assistant",
+        name: 'GDGoC IET DAVV Assistant',
       });
 
       const channel = serverClient.channel(channel_type, channel_id);
@@ -101,16 +111,21 @@ app.post("/start-ai-agent", async (req: { body: { channel_id: any; channel_type?
         aiAgentCache.set(user_id, agent);
       }
     } else {
-      console.log(`GDGoC IET DAVV Agent ${user_id} already started or is pending.`);
+      console.log(
+        `GDGoC IET DAVV Agent ${user_id} already started or is pending.`
+      );
     }
 
-    res.json({ message: "GDGoC IET DAVV Agent started", data: [] });
+    res.json({ message: 'GDGoC IET DAVV Agent started', data: [] });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to start GDGoC IET DAVV Agent", errorMessage);
+    console.error('Failed to start GDGoC IET DAVV Agent', errorMessage);
     res
       .status(500)
-      .json({ error: "Failed to start GDGoC IET DAVV Agent", reason: errorMessage });
+      .json({
+        error: 'Failed to start GDGoC IET DAVV Agent',
+        reason: errorMessage,
+      });
   } finally {
     pendingAiAgents.delete(user_id);
   }
@@ -119,10 +134,10 @@ app.post("/start-ai-agent", async (req: { body: { channel_id: any; channel_type?
 /**
  * Handle the request to stop the AI Agent
  */
-app.post("/stop-ai-agent", async (req: { body: { channel_id: any; }; }, res: { json: (arg0: { message: string; data: never[]; }) => void; status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; reason: string; }): void; new(): any; }; }; }) => {
+app.post('/stop-ai-agent', async (req: Request, res: Response) => {
   const { channel_id } = req.body;
   console.log(`[API] /stop-ai-agent called for channel: ${channel_id}`);
-  const user_id = `ai-bot-${channel_id.replace(/[!]/g, "")}`;
+  const user_id = `ai-bot-${channel_id.replace(/[!]/g, '')}`;
   try {
     const aiAgent = aiAgentCache.get(user_id);
     if (aiAgent) {
@@ -132,121 +147,123 @@ app.post("/stop-ai-agent", async (req: { body: { channel_id: any; }; }, res: { j
     } else {
       console.log(`[API] Agent for ${user_id} not found in cache.`);
     }
-    res.json({ message: "GDGoC IET DAVV Agent stopped", data: [] });
+    res.json({ message: 'GDGoC IET DAVV Agent stopped', data: [] });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to stop GDGoC IET DAVV Agent", errorMessage);
+    console.error('Failed to stop GDGoC IET DAVV Agent', errorMessage);
     res
       .status(500)
-      .json({ error: "Failed to stop GDGoC IET DAVV Agent", reason: errorMessage });
+      .json({
+        error: 'Failed to stop GDGoC IET DAVV Agent',
+        reason: errorMessage,
+      });
   }
 });
 
-app.post("/refresh-drive-images", async (_req, res) => {
+app.post('/refresh-drive-images', async (_req, res) => {
   try {
     const index = await refreshDriveImageIndex();
     res.json({
-      message: "Drive images refreshed",
+      message: 'Drive images refreshed',
       count: index.items.length,
       refreshedAt: index.refreshedAt,
     });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to refresh Drive images", errorMessage);
+    console.error('Failed to refresh Drive images', errorMessage);
     res.status(500).json({
-      error: "Failed to refresh Drive images",
+      error: 'Failed to refresh Drive images',
       reason: errorMessage,
     });
   }
 });
 
-app.post("/refresh-csv-index", async (_req, res) => {
+app.post('/refresh-csv-index', async (_req, res) => {
   try {
     const index = await refreshCsvIndex();
     res.json({
-      message: "CSV index refreshed",
+      message: 'CSV index refreshed',
       count: index.records.length,
       refreshedAt: index.refreshedAt,
     });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to refresh CSV index", errorMessage);
+    console.error('Failed to refresh CSV index', errorMessage);
     res.status(500).json({
-      error: "Failed to refresh CSV index",
+      error: 'Failed to refresh CSV index',
       reason: errorMessage,
     });
   }
 });
 
-app.post("/refresh-json-index", async (_req, res) => {
+app.post('/refresh-json-index', async (_req, res) => {
   try {
     const index = await refreshJsonIndex();
     res.json({
-      message: "JSON index refreshed",
+      message: 'JSON index refreshed',
       count: index.records.length,
       refreshedAt: index.refreshedAt,
     });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to refresh JSON index", errorMessage);
+    console.error('Failed to refresh JSON index', errorMessage);
     res.status(500).json({
-      error: "Failed to refresh JSON index",
+      error: 'Failed to refresh JSON index',
       reason: errorMessage,
     });
   }
 });
 
-app.post("/refresh-qa-index", async (_req, res) => {
+app.post('/refresh-qa-index', async (_req, res) => {
   try {
     const index = await refreshQaIndex();
     res.json({
-      message: "QA index refreshed",
+      message: 'QA index refreshed',
       count: index.records.length,
       refreshedAt: index.refreshedAt,
     });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to refresh QA index", errorMessage);
+    console.error('Failed to refresh QA index', errorMessage);
     res.status(500).json({
-      error: "Failed to refresh QA index",
+      error: 'Failed to refresh QA index',
       reason: errorMessage,
     });
   }
 });
 
-app.get("/agent-status", (req: { query: { channel_id: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; }; json: (arg0: { status: string; }) => void; }) => {
+app.get('/agent-status', (req: Request, res: Response) => {
   const { channel_id } = req.query;
-  if (!channel_id || typeof channel_id !== "string") {
-    return res.status(400).json({ error: "Missing channel_id" });
+  if (!channel_id || typeof channel_id !== 'string') {
+    return res.status(400).json({ error: 'Missing channel_id' });
   }
-  const user_id = `ai-bot-${channel_id.replace(/[!]/g, "")}`;
+  const user_id = `ai-bot-${channel_id.replace(/[!]/g, '')}`;
   console.log(
     `[API] /agent-status called for channel: ${channel_id} (user: ${user_id})`
   );
 
   if (aiAgentCache.has(user_id)) {
     console.log(`[API] Status for ${user_id}: connected`);
-    res.json({ status: "connected" });
+    res.json({ status: 'connected' });
   } else if (pendingAiAgents.has(user_id)) {
     console.log(`[API] Status for ${user_id}: connecting`);
-    res.json({ status: "connecting" });
+    res.json({ status: 'connecting' });
   } else {
     console.log(`[API] Status for ${user_id}: disconnected`);
-    res.json({ status: "disconnected" });
+    res.json({ status: 'disconnected' });
   }
 });
 
 // Token provider endpoint - generates secure tokens
-app.post("/token", async (req: { body: { userId: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): void; new(): any; }; }; json: (arg0: { token: any; }) => void; }) => {
+app.post('/token', async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
 
     if (!userId) {
       return res.status(400).json({
-        error: "userId is required",
+        error: 'userId is required',
       });
     }
-
 
     // Create token with expiration (1 hour) and issued at time for security
     const issuedAt = Math.floor(Date.now() / 1000);
@@ -256,23 +273,25 @@ app.post("/token", async (req: { body: { userId: any; }; }, res: { status: (arg0
 
     res.json({ token });
   } catch (error) {
-    console.error("Error generating token:", error);
+    console.error('Error generating token:', error);
     res.status(500).json({
-      error: "Failed to generate token",
+      error: 'Failed to generate token',
     });
   }
 });
 
-app.post("/guest-cleanup", async (req, res) => {
+app.post('/guest-cleanup', async (req, res) => {
   try {
     const { userId } = req.body as { userId?: string };
 
     if (!userId) {
-      return res.status(400).json({ error: "userId is required" });
+      return res.status(400).json({ error: 'userId is required' });
     }
 
-    const filter = { type: "messaging", members: { $in: [userId] } };
-    const sort = { last_message_at: -1 };
+    const filter = { type: 'messaging', members: { $in: [userId] } };
+    const sort: ChannelSort = {
+      last_message_at: 'desc' as unknown as AscDesc,
+    };
     const limit = 30;
     let offset = 0;
 
@@ -290,7 +309,7 @@ app.post("/guest-cleanup", async (req, res) => {
         try {
           await channel.delete();
         } catch (error) {
-          console.error("Failed to delete guest channel", error);
+          console.error('Failed to delete guest channel', error);
         }
       }
 
@@ -303,30 +322,25 @@ app.post("/guest-cleanup", async (req, res) => {
     try {
       await serverClient.deleteUser(userId, { hard_delete: true });
     } catch (error) {
-      console.error("Failed to delete guest user", error);
+      console.error('Failed to delete guest user', error);
     }
 
-    res.json({ message: "Guest cleanup completed" });
+    res.json({ message: 'Guest cleanup completed' });
   } catch (error) {
     const errorMessage = (error as Error).message;
-    console.error("Failed to cleanup guest session", errorMessage);
+    console.error('Failed to cleanup guest session', errorMessage);
     res.status(500).json({
-      error: "Failed to cleanup guest session",
+      error: 'Failed to cleanup guest session',
       reason: errorMessage,
     });
   }
 });
 
-
-
-
-
-
-app.post("/livekit-token", (req: { body: { roomName: any; identity: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): any; new(): any; }; }; json: (arg0: { token: any; }) => void; }) => {
+app.post('/livekit-token', (req: Request, res: Response) => {
   const { roomName, identity } = req.body;
 
   if (!roomName || !identity) {
-    return res.status(400).json({ error: "Missing roomName or identity" });
+    return res.status(400).json({ error: 'Missing roomName or identity' });
   }
 
   // Create a token with permissions to join a room.
@@ -347,7 +361,6 @@ app.post("/livekit-token", (req: { body: { roomName: any; identity: any; }; }, r
 
   res.json({ token: token.toJwt() });
 });
-
 
 async function disposeAiAgent(aiAgent: AIAgent) {
   await aiAgent.dispose();
