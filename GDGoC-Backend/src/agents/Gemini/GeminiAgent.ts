@@ -136,7 +136,6 @@ export class GeminiAgent implements AIAgent {
   private lastInteractionTs = Date.now();
 
   private handlers: GEMINIResponseHandler[] = []; // Handlers now use the Gemini type
-  // private pendingMessages: Array<{ text: string; imageUrl?: string }> = [];
 
   constructor(
     readonly chatClient: StreamChat,
@@ -251,15 +250,6 @@ export class GeminiAgent implements AIAgent {
       return; // No text or image to process
     }
 
-  //   if (this.handlers.length > 0) {
-  //     this.pendingMessages.push({ text: message || '', imageUrl });
-  //     return;
-  //   }
-
-  //   await this.processUserMessage(message || '', imageUrl);
-  // };
-
-  // private processUserMessage = async (message: string, imageUrl?: string) => {
     this.lastInteractionTs = Date.now();
 
     // Context handling remains, although Gemini handles System Instructions globally.
@@ -311,12 +301,5 @@ export class GeminiAgent implements AIAgent {
     this.handlers = this.handlers.filter(
       (handler) => handler !== handlerToRemove
     );
-
-    // if (this.handlers.length === 0 && this.pendingMessages.length > 0) {
-    //   const next = this.pendingMessages.shift();
-    //   if (next) {
-    //     void this.processUserMessage(next.text, next.imageUrl);
-    //   }
-    // }
   };
 }
